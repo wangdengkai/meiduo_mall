@@ -132,7 +132,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
+# 使用自定义的模型类，作为用户模型
+AUTH_USER_MODEL = 'users.User'
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
 
