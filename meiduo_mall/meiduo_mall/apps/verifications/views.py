@@ -2,13 +2,15 @@ from django.http import HttpResponse
 from django_redis import get_redis_connection
 from rest_framework.views import APIView
 
-from meiduo_mall.meiduo_mall.libs.captcha.captcha import captcha
-from meiduo_mall.meiduo_mall.utils import constants
+from meiduo_mall.libs.captcha.captcha import captcha
+from . import constants
+
 
 
 class ImageCodeView(APIView):
-    ''' 图片验证码'''
-
+    '''
+    图片验证码
+    '''
 
     def get(self,request,image_code_id):
         '''
