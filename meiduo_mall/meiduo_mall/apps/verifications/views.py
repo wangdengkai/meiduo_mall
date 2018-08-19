@@ -1,13 +1,16 @@
 from django.http import HttpResponse
 from django_redis import get_redis_connection
+from rest_framework.generics import GenericAPIView
 from rest_framework.views import APIView
 
 from meiduo_mall.libs.captcha.captcha import captcha
 from . import constants
-
+from .serializers import CheckImageCodeSerializer
 
 
 class ImageCodeView(APIView):
+
+
     '''
     图片验证码
     '''
@@ -30,3 +33,13 @@ class ImageCodeView(APIView):
         # 固定返回验证码图片数据，不需要REST framework框架的Response帮助我们决定返回响应数据的格式
         # 所以此处直接使用Django原生的HttpResponse即可
         return HttpResponse(image,content_type='images/jpg')
+
+
+class SMSCodeView(GenericAPIView):
+
+    serializer_class = CheckImageCodeSerializer
+
+    def get(self,request,mobile):
+
+        serialize = self.get_serializer()
+        serialize.is_valid(raise_exception=True)

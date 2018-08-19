@@ -21,7 +21,7 @@ var vm = new Vue({
 		image_code_url:''  // 验证码图片路径
 	},
 	mounted:function(){
-		this.image_code_id=this.generate_uuid();
+		// this.image_code_id=this.generate_uuid();
 	//	发起请求，请求图片验证吗
 	// 	axios.get('http://127.0.0.1:8000/image_codes/'+this.image_code_id+"/")
 	// 		.then(response=>{
@@ -31,7 +31,8 @@ var vm = new Vue({
 	//
 	// 		})
 	//
-		this.image_code_url='http://127.0.0.1:8000/image_codes/'+this.image_code_id+"/"
+	// 	this.image_code_url='http://127.0.0.1:8000/image_codes/'+this.image_code_id+"/"
+		this.generate_image_code()
 	},
 	methods: {
 		// 生成uuid
@@ -46,6 +47,11 @@ var vm = new Vue({
 				return (c =='x' ? r : (r&0x3|0x8)).toString(16);
 			});
 			return uuid;
+		},
+		generate_image_code:function(){
+			//生成唯一编码
+			this.image_code_id=this.generate_uuid();
+			this.image_code_url='http://127.0.0.1:8000/image_codes/'+this.image_code_id+"/"
 		},
 		check_username: function (){
 			var len = this.username.length;
