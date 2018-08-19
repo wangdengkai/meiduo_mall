@@ -1,10 +1,30 @@
-from django.shortcuts import render
-
-# Create your views here.
-#url('^image_codes/(?P<image_code_id>[\w-]+)/$',views.ImageCodeView.as_view()),
+from django.http import HttpResponse
+from django_redis import get_redis_connection
 from rest_framework.views import APIView
+
+from meiduo_mall.meiduo_mall.libs.captcha.captcha import captcha
+from meiduo_mall.meiduo_mall.utils import constants
 
 
 class ImageCodeView(APIView):
     ''' 图片验证码'''
-    pass
+
+
+    def get(self,request,image_code_id):
+        '''
+        获取图片验证码
+        :param request: 前段发送的请求
+        :param image_code_id: 图片验证码id
+        :return: 图片
+        '''
+
+        #生成验证码的图片
+        text,image = captcha.generate_captcha()
+
+
+        redis_conn = get_redis_connection('verify_codes')
+        redis_conn.setex("img_%s" %image_code_id,constants.IMAGE_CODE_REDIS_EXPIRES,text)
+
+        # 固定返回验证码图片数据，不需要REST framework框架的Response帮助我们决定返回响应数据的格式
+        # 所以此处直接使用Django原生的HttpResponse即可
+        return HttpResponse(image,content_type='images/jpg')
