@@ -1,3 +1,4 @@
+
 var vm = new Vue({
 	el: '#app',
 	data: {
@@ -8,11 +9,14 @@ var vm = new Vue({
 		error_allow: false,
 		error_image_code: false,
 		error_sms_code: false,
+		error_image_code_message:'',
+		error_sms_code_message: '',
+		error_phone_message:'',
 
 		username: '',
 		password: '',
 		password2: '',
-		mobile: '', 
+		mobile: '',
 		image_code: '',
 		sms_code: '',
 		allow: false ,
@@ -22,8 +26,10 @@ var vm = new Vue({
 
 		sms_code_tip:'获取短信验证码',
 		sending_flag:false,   //正在发送短信标志
+
 	},
 	mounted:function(){
+
 		// this.image_code_id=this.generate_uuid();
 	//	发起请求，请求图片验证吗
 	// 	axios.get('http://127.0.0.1:8000/image_codes/'+this.image_code_id+"/")
@@ -56,6 +62,7 @@ var vm = new Vue({
 			this.image_code_id=this.generate_uuid();
 			this.image_code_url='http://127.0.0.1:8000/image_codes/'+this.image_code_id+"/"
 		},
+        //检查用户名
 		check_username: function (){
 			var len = this.username.length;
 			if(len<5||len>20) {
@@ -63,6 +70,22 @@ var vm = new Vue({
 			} else {
 				this.error_name = false;
 			}
+
+			//检查重名
+            if (this.error_name == false){
+                // axios.get('http://127.0.0.1:8000/usernames/' + this.username + '/count/',{
+			     //    responseType:'json'
+                // })
+				axios.get(host +'usernames/'+ this.username + '/count/',{
+			        responseType:'json'
+                })
+                    .then(response=>{
+                        if(response.data.count > 0) {
+                            this.error_name_message = '用户名已经存在';
+                            this.error_name =true;
+                }
+                })
+            }
 		},
 		check_pwd: function (){
 			var len = this.password.length;
@@ -70,14 +93,14 @@ var vm = new Vue({
 				this.error_password = true;
 			} else {
 				this.error_password = false;
-			}		
+			}
 		},
 		check_cpwd: function (){
 			if(this.password!=this.password2) {
 				this.error_check_password = true;
 			} else {
 				this.error_check_password = false;
-			}		
+			}
 		},
 		check_phone: function (){
 			var re = /^1[345789]\d{9}$/;
@@ -85,6 +108,23 @@ var vm = new Vue({
 				this.error_phone = false;
 			} else {
 				this.error_phone = true;
+				this.error_phone_message="您输入的手机号格式不正确";
+			}
+			if(this.error_phone == false){
+				axios.get(host+'mobiles/' +this.mobile +'/count/',{
+					responseType:'json'
+				})
+					.then(response=>{
+						if(response.data.count > 0){
+							this.error_phone_message = '手机号已经存在';
+							this.error_phone = true;
+						}else{
+							this.error_phone = false;
+						}
+					})
+					.catch(error=>{
+						console.log(error.response.data);
+					})
 			}
 		},
 		check_image_code: function (){
@@ -92,7 +132,7 @@ var vm = new Vue({
 				this.error_image_code = true;
 			} else {
 				this.error_image_code = false;
-			}	
+			}
 		},
 		check_sms_code: function(){
 			if(!this.sms_code){
@@ -108,23 +148,23 @@ var vm = new Vue({
 				this.error_allow = false;
 			}
 		},
-		//发送手机短信验证码
+		//发送短信验证码
 		send_sms_code:function(){
-			if(this.sending_flag == true){
-				return ;
-			}
-			this.sending_flag = true;
-			//校验参数，保证输入框由数据填写
-			this.check_phone();
-			this.check_image_code();
+			if (this.sending_flag == true) {
+                return;
+            }
+            this.sending_flag = true;
 
-			if(this.error_phone == true || this.error_image_code == true){
-				this.sending_flag = false;
-				return ;
-			}
+            // 校验参数，保证输入框有数据填写
+            this.check_phone();
+            this.check_image_code();
 
-			//向后端发送请求，让后端发送短信验证码
-			 axios.get(this.host + '/sms_codes/' + this.mobile + '/?text=' + this.image_code+'&image_code_id='+ this.image_code_id, {
+            if (this.error_phone == true || this.error_image_code == true) {
+                this.sending_flag = false;
+                return;
+            }
+
+			axios.get('http://127.0.0.1:8000/sms_codes/' + this.mobile + '/?text=' + this.image_code+'&image_code_id='+ this.image_code_id, {
                     responseType: 'json'
                 })
                 .then(response => {
@@ -158,6 +198,7 @@ var vm = new Vue({
                     this.sending_flag = false;
                 })
 
+
 		},
 		// 注册
 		on_submit: function(){
@@ -167,6 +208,6 @@ var vm = new Vue({
 			this.check_phone();
 			this.check_sms_code();
 			this.check_allow();
-		}
+		},
 	}
 });
