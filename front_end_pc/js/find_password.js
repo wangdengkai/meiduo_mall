@@ -132,10 +132,13 @@ var vm = new Vue({
         // 第二步
         // 发送短信验证码
         send_sms_code: function(){
-            if(this.sending_flag == true):{
+
+            if(this.sending_flag == true){
                 return;
             }
+
             this.sending_flag = true;
+
             axios.get(this.host+'sms_codes/?access_token='+this.access_token,{
                 responseType:'json'
             })
