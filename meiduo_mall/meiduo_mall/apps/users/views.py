@@ -86,7 +86,7 @@ class SMSCodeTokenView(GenericAPIView):
         access_token = user.generate_send_sms_code_token()
 
         #修改手机号
-        print(user.mobile)
+        # print(user.mobile)
         mobile=re.sub(r'(\d{3})\d{4}(\d{4})',r'\1****\2',user.mobile)
         # mobile=re.sub(r'(\d{3})\d{4}(\d{4})',r'\1****\2','15191800620')
 
@@ -95,3 +95,27 @@ class SMSCodeTokenView(GenericAPIView):
             'mobile':mobile,
             'access_token': access_token,
         })
+
+
+class PasswordTokenView(GenericAPIView)
+    '''用户设置米吗的token'''
+
+    serializer_class = serializers.CheckSMSCodeSerializer
+
+    def get(self,request,account):
+        '''
+        根据用户账号获取修改密码的token
+        :param request:
+        :param account:
+        :return:
+        '''
+        serializer = self.get_serializer(data=request.query_params)
+        serializer.is_valid(raise_exception=True)
+
+        user = serializer.user
+
+        #生成修改用户米吗的access——token
+        access_token = user.generate_set_password_token()
+
+        return Response({'user_id':user.id,'access_token':access_token})
+

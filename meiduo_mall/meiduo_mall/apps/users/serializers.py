@@ -3,7 +3,9 @@ import re
 from rest_framework_jwt.settings import  api_settings
 from django_redis import get_redis_connection
 from rest_framework import serializers
+
 from .models import User
+from .utils import get_User_by_account
 
 
 class CreateUserSerializer(serializers.ModelSerializer):
@@ -92,6 +94,31 @@ class CreateUserSerializer(serializers.ModelSerializer):
         user.token =token
 
         return user
+
+
+class CheckSMSCodeSerializer(serializers.Serializer):
+    '''
+    检查sms code
+    '''
+    sms_code = serializers.CharField(min_length=6,max_length=6)
+
+    def validate(self, attrs):
+        account = self.context['view'].kwargs['account']
+        #获取user
+        user = get_User_by_account(account)
+        if user is None:
+            raise serializers.ValidationError('用户不存在')
+
+        redis_conn = get_redis_connection('verify_codes')
+        real_sms_code = redis_conn.get('sms_%s' % user.mobile)
+
+        if real_sms_code is None:
+            raise serializers.ValidationError('无效的短信验证码')
+
+        if attrs != real_sms_code.decode():
+            raise serializers.ValidationError('短信验证码错误')
+
+        return attrs
 
 
 

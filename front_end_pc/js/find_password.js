@@ -70,7 +70,7 @@ var vm = new Vue({
             this.image_code_id = this.generate_uuid();
 
             // 设置页面中图片验证码img标签的src属性
-            this.image_code_url = this.host + "/image_codes/" + this.image_code_id + "/";
+            this.image_code_url = this.host + "image_codes/" + this.image_code_id + "/";
         },
         // 检查数据
         check_username: function(){
@@ -172,7 +172,34 @@ var vm = new Vue({
         },
         // 第二步表单提交，验证手机号，获取修改密码的access_token
         form_2_on_submit: function(){
+            this.check_sms_code();
+            if(this.error_sms_code == false){
+                axios.get(this.host+'accounts/'+this.username+'/password/token/?sms_code='+this.sms_code,{
+                    responseType:'json'
+                })
+                    .then(response =>{
+                        this.user_id = response.data.user_id;
+                        this.access_token = response.data.access_token;
+                        this.step_class['step-3'] = true;
+                        this.step_class['step-2'] = false;
+                        this.is_show_form_2 = false;
+                        this.is_show_form_3 = true;
 
+                    })
+                    .catch(error=>{
+                        if(error.response.status == 400){
+                            this.error_sms_code =true;
+                            this.error_sms_code_message = '验证码错误';
+                        }else if(error.response.status == 404 ){
+                            this.error_sms_code_message = '手机号不存在';
+                            this.error_sms_code = true;
+
+                        }else{
+                            alert(error.response.data.message);
+                            console.log(error.response.data);
+                        }
+                    })
+            }
         },
 
         // 第三步

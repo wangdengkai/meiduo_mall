@@ -10,9 +10,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from meiduo_mall.libs.yuntongxun.sms import CCP
-from meiduo_mall.apps.users.models import User
+from users.models import User
 
-from meiduo_mall.celery_tasks.sms.tasks import send_sms_code
+from celery_tasks.sms.tasks import send_sms_code
 from . import constants
 from .serializers import CheckImageCodeSerializer
 
@@ -76,7 +76,7 @@ class SMSCodeView(GenericAPIView):
         # except Exception as e:
         #     print(e)
         # # 使用celery发布异步任务
-        print(sms_code)
+
         sms_tasks.send_sms_code.delay(mobile,sms_code,constants.SMS_CODE_REDIS_EXPIRES / 60)
 
         return Response({'message':'OK'})
@@ -131,6 +131,7 @@ class SMSCodeByTokenView(APIView):
         pl.setex('sms_%s' % mobile,constants.SMS_CODE_REDIS_EXPIRES,sms_code)
         pl.setex('send_flag_%s' %mobile,constants.SEND_SMS_CODE_INTERVAL,1)
         #发送短信验证码
+
         sms_tasks.send_sms_code.delay(mobile,sms_code,constants.SMS_CODE_REDIS_EXPIRES/60)
         return Response({'message':'ok'},status=status.HTTP_200_OK)
 
