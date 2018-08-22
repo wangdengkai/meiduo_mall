@@ -155,6 +155,10 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # 使用自定义的模型类，作为用户模型
 AUTH_USER_MODEL = 'users.User'
+#自定义认证后端
+AUTHENTICATION_BACKENDS = [
+    'users.utils.UsernameMobileAuthBackend',
+]
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
 
@@ -238,4 +242,5 @@ REST_FRAMWORK={
 
 JWT_AUTH = {
     'JWT_EXPIRATION_DELTA': datetime.timedelta(days=1),
+    'JWT_RESPONSE_PAYLOAD_HANDLER': 'users.utils.jwt_response_payload_handler',
 }
