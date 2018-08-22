@@ -23,7 +23,8 @@ def send_sms_code(mobile,code,expires):
     logging.info('-----------------------------------')
     try:
         ccp =CCP()
-        result = ccp.send_template_sms(mobile,[code,expires],SMS_CODE_TEMP_ID)
+        # result = ccp.send_template_sms(mobile,[code,expires],SMS_CODE_TEMP_ID)
+        result = 0
     except Exception as e:
         logger.error("发送短信验证码【异常】：%s,message:%s ]" %(mobile,e))
 

@@ -5,26 +5,28 @@
 	<title>美多商城-登录</title>
 	<link rel="stylesheet" type="text/css" href="css/reset.css">
 	<link rel="stylesheet" type="text/css" href="css/main.css">
+	<script type="text/javascript" src="js/vue-2.5.16.js"></script>
+	<script type="text/javascript" src="js/axios_0.18.0.min(1).js"></script>
 </head>
 <body>
 	<div class="login_top clearfix">
 		<a href="index.html" class="login_logo"><img src="images/logo02.png"></a>	
 	</div>
-	<div class="login_form_bg">
+	<div class="login_form_bg" id="app">
 		<div class="login_form_wrap clearfix">
 			<div class="login_banner fl"></div>
 			<div class="slogan fl">商品美 · 种类多 · 欢迎光临</div>
-			<div class="login_form fr" id="app">
+			<div class="login_form fr" >
 				<div class="login_title clearfix">
 					<a href="javascript:;" class="cur">账户登录</a>
 				</div>
 				<div class="form_con">
 					<div class="form_input cur">
-						<form id="login-form" @submit.prevent="'on_submit">
-							<input type="text" v-model="username" @blur='check_username' class="name_input" placeholder="请输入用户名">
-							<div v-show="error_username" class=user_error" v-cloak>请填写用户名或手机号</div>
+						<form id="login-form" @submit.prevent="on_submit">
+							<input type="text" v-model="username" @blur="check_username" name="" class="name_input" placeholder="请输入用户名或手机号">
+							<div v-show="error_username" class="user_error" v-cloak>请填写用户名或手机号</div>
 							<input type="password" v-model="password" @blur="check_pwd" name="pwd" class="pass_input" placeholder="请输入密码">
-							<div v-show="error_pwd"  class="pwd_error" v-cloak>{{ error_pwd_message }}</div>
+							<div v-show="error_pwd" class="pwd_error" v-cloak>{{ error_pwd_message }}</div>
 							<div class="more_input clearfix">
 								<input type="checkbox" v-model="remember">
 								<label>记住登录</label>

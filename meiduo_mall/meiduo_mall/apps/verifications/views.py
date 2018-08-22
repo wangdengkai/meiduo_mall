@@ -131,6 +131,7 @@ class SMSCodeByTokenView(APIView):
         pl.setex('sms_%s' % mobile,constants.SMS_CODE_REDIS_EXPIRES,sms_code)
         pl.setex('send_flag_%s' %mobile,constants.SEND_SMS_CODE_INTERVAL,1)
         #发送短信验证码
+        pl.execute()
 
         sms_tasks.send_sms_code.delay(mobile,sms_code,constants.SMS_CODE_REDIS_EXPIRES/60)
         return Response({'message':'ok'},status=status.HTTP_200_OK)

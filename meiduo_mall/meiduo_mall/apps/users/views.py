@@ -4,6 +4,7 @@ from django.shortcuts import render
 
 # Create your views here.
 # url(r'^usernames/(?P<username>\w{5,20})/count/$', views.UsernameCountView.as_view()),
+from rest_framework import mixins
 from rest_framework import status
 
 from rest_framework.generics import CreateAPIView,GenericAPIView
@@ -97,7 +98,7 @@ class SMSCodeTokenView(GenericAPIView):
         })
 
 
-class PasswordTokenView(GenericAPIView)
+class PasswordTokenView(GenericAPIView):
     '''用户设置米吗的token'''
 
     serializer_class = serializers.CheckSMSCodeSerializer
@@ -109,6 +110,7 @@ class PasswordTokenView(GenericAPIView)
         :param account:
         :return:
         '''
+        print(request.query_params)
         serializer = self.get_serializer(data=request.query_params)
         serializer.is_valid(raise_exception=True)
 
@@ -118,4 +120,16 @@ class PasswordTokenView(GenericAPIView)
         access_token = user.generate_set_password_token()
 
         return Response({'user_id':user.id,'access_token':access_token})
+
+
+
+class PasswordView(mixins.UpdateModelMixin,GenericAPIView):
+    '''
+    用户密码
+    '''
+    queryset = User.objects.all()
+    serializer_class = serializers.ResetPasswordSerializer
+
+    def post(self,request,pk):
+        return self.update(request,pk)
 

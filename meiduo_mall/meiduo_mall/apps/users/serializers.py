@@ -109,16 +109,62 @@ class CheckSMSCodeSerializer(serializers.Serializer):
         if user is None:
             raise serializers.ValidationError('用户不存在')
 
+        # 把user对象保存到序列化器对象中
+        self.user = user
+
         redis_conn = get_redis_connection('verify_codes')
         real_sms_code = redis_conn.get('sms_%s' % user.mobile)
 
         if real_sms_code is None:
             raise serializers.ValidationError('无效的短信验证码')
 
-        if attrs != real_sms_code.decode():
+
+        if attrs['sms_code'] != real_sms_code.decode():
             raise serializers.ValidationError('短信验证码错误')
 
         return attrs
+
+
+class ResetPasswordSerializer(serializers.ModelSerializer):
+    '''重置密码序列化器'''
+    password2 = serializers.CharField(label='确认密码',write_only=True)
+    access_token = serializers.CharField(label='操作token',write_only=True)
+
+    class Meta:
+        model = User
+        fields =('id','password','password2','access_token')
+        extra_kwargs = {
+            'password':{
+                'write_only':True,
+                'min_length':8,
+                'max_length':20,
+                'error_messages':{
+                    'min_length':'仅仅允许8-20个字符的密码',
+                    'max_length':'仅仅允许8-20个字符的密码',
+                }
+            }
+        }
+
+    def validate(self, attrs):
+        '''校验数据'''
+        #判断两次密码
+        if attrs['password'] != attrs['password2'] :
+            raise  serializers.ValidationError('两次密码不一致')
+
+        #判断access——token
+        allow = User.check_set_password_token(attrs['access_token'],self.context['view'].kwargs['pk'])
+        if not allow:
+            raise serializers.ValidationError('无效的access——token')
+
+        return attrs
+
+    def update(self, instance, validated_data):
+        '''更新密码'''
+
+        #调用django用户模型累的设置密码方法
+        instance.set_password(validated_data['password'])
+        instance.save()
+        return instance
 
 
 
