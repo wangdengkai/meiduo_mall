@@ -29,7 +29,7 @@ def get_User_by_account(account):
         else:
             #否则分局suername查询
             user=User.objects.get(username=account)
-    except User.DoesNotExist:
+    except Exception:
         return None
     else:
         return user
