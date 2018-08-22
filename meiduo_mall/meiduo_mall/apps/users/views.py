@@ -2,10 +2,14 @@ from django.shortcuts import render
 
 # Create your views here.
 # url(r'^usernames/(?P<username>\w{5,20})/count/$', views.UsernameCountView.as_view()),
+
+from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from . import serializers
 from .models import  User
+
 
 class UsernameCountView(APIView):
     '''
@@ -49,3 +53,12 @@ class MobileCountView(APIView):
         }
 
         return Response(data)
+
+
+class UserView(CreateAPIView):
+    '''
+    用户注册
+    传入参数，
+        username,password,password2,sms_code,mobile,allow
+    '''
+    serializer_class = serializers.CreateUserSerializer
