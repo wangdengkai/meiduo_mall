@@ -167,5 +167,12 @@ class ResetPasswordSerializer(serializers.ModelSerializer):
         return instance
 
 
+class UserDetailSerializer(serializers.ModelSerializer):
 
+    '''
+    用户详细信息序列化器
+    '''
 
+    class Meta:
+        model = User
+        fields =('id','username','mobile','email','email_active')

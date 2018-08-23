@@ -7,7 +7,8 @@ from django.shortcuts import render
 from rest_framework import mixins
 from rest_framework import status
 
-from rest_framework.generics import CreateAPIView,GenericAPIView
+from rest_framework.generics import CreateAPIView,GenericAPIView, RetrieveAPIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -132,4 +133,14 @@ class PasswordView(mixins.UpdateModelMixin,GenericAPIView):
 
     def post(self,request,pk):
         return self.update(request,pk)
+
+
+class UserDetailView(RetrieveAPIView):
+    '''用户详情'''
+
+    serializer_class = serializers.UserDetailSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
 
