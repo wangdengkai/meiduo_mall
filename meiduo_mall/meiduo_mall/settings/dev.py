@@ -15,6 +15,8 @@ import os
 import sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+import datetime
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 sys.path.insert(0,os.path.join(BASE_DIR,'apps'))
@@ -27,7 +29,7 @@ SECRET_KEY = 'qys4l!^pe$*&aw+4z&sju#6u%9l2u6#rx3182ue#=5&$sn(7dk'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['api.meiduo.site','127.0.0.1','localhost','www.meiduo.site']
 
 
 # Application definition
@@ -38,22 +40,35 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'rest_framework',
+    'corsheaders',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'users.apps.UsersConfig',
+    'verifications.apps.VerificationsConfig',
+    'oauth.apps.OauthConfig',
+
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'rest_framework',
+
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+#CORS
+CORS_ORIGIN_WHITELIST = (
+    '127.0.0.1:8080',
+    'localhost:8080',
+    'www.meiduo.site:8080',
+    'api.meiduo.site:8080',
+)
 
+CORS_ALLOW_CREDENTIALS = True    #允许携带cookie
 ROOT_URLCONF = 'meiduo_mall.urls'
 
 TEMPLATES = [
@@ -108,6 +123,13 @@ CACHES={
         'OPTIONS':{
             'CLIENT_CLASS':'django_redis.client.DefaultClient',
         }
+    },
+    'verify_codes':{
+        'BACKEND':'django_redis.cache.RedisCache',
+        'LOCATION':'redis://127.0.0.1:6379/2',
+        'OPTIONS':{
+            'CLIENT_CLASS':'django_redis.client.DefaultClient',
+        }
     }
 }
 # 修改Django的Session机制存储主要是为了给Admin站点使用。
@@ -132,7 +154,12 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
+# 使用自定义的模型类，作为用户模型
+AUTH_USER_MODEL = 'users.User'
+#自定义认证后端
+AUTHENTICATION_BACKENDS = [
+    'users.utils.UsernameMobileAuthBackend',
+]
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
 
@@ -207,4 +234,20 @@ LOGGING = {
 REST_FRAMWORK={
     #异常处理
     'EXCEPTION_HANDLER':'meiduo_mall.utils.exceptions.exception_exception_handler',
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ),
 }
+
+JWT_AUTH = {
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=1),
+    'JWT_RESPONSE_PAYLOAD_HANDLER': 'users.utils.jwt_response_payload_handler',
+}
+
+
+# QQ登录参数
+QQ_APP_ID = '101474184'
+QQ_APP_KEY = 'c6ce949e04e12ecc909ae6a8b09b637c'
+QQ_REDIRECT_URL = 'http://www.meiduo.site:8080/oauth_callback.html'
