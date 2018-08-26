@@ -15,6 +15,8 @@ class OAuthQQUser(BaseModel):
         verbose_name = 'QQ登录用户书数据'
         verbose_name_plural = verbose_name
 
+# import django.contrib.auth.middleware.AuthenticationMiddleware
+
 
 
 

@@ -35,12 +35,14 @@ ALLOWED_HOSTS = ['api.meiduo.site','127.0.0.1','localhost','www.meiduo.site']
 # Application definition
 
 INSTALLED_APPS = [
+    'corsheaders',
+    'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-    'rest_framework',
-    'corsheaders',
+
+
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'users.apps.UsersConfig',
@@ -48,6 +50,7 @@ INSTALLED_APPS = [
     'oauth.apps.OauthConfig',
 
 ]
+
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -65,9 +68,19 @@ CORS_ORIGIN_WHITELIST = (
     '127.0.0.1:8080',
     'localhost:8080',
     'www.meiduo.site:8080',
-    'api.meiduo.site:8080',
+    'api.meiduo.site:8000',
 )
-
+CORS_ALLOW_HEADERS = (
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+)
 CORS_ALLOW_CREDENTIALS = True    #允许携带cookie
 ROOT_URLCONF = 'meiduo_mall.urls'
 
@@ -231,23 +244,34 @@ LOGGING = {
 
 
 # restframework  设置
-REST_FRAMWORK={
+REST_FRAMEWORK={
     #异常处理
     'EXCEPTION_HANDLER':'meiduo_mall.utils.exceptions.exception_exception_handler',
+    #  'DEFAULT_PERMISSION_CLASSES': (
+    #     'rest_framework.permissions.IsAuthenticated',
+    # ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
+        # 'rest_framework.authentication.TokenAuthentication'
     ),
+
 }
 
+
+# import rest_framework_jwt.authentication.JSONWebTokenAuthentication
 JWT_AUTH = {
     'JWT_EXPIRATION_DELTA': datetime.timedelta(days=1),
+    # 'JWT_AUTH_HEADER_PREFIX': 'JWT',#JWT跟前端保持一致，
     'JWT_RESPONSE_PAYLOAD_HANDLER': 'users.utils.jwt_response_payload_handler',
 }
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-# QQ登录参数
-QQ_APP_ID = '101474184'
-QQ_APP_KEY = 'c6ce949e04e12ecc909ae6a8b09b637c'
-QQ_REDIRECT_URL = 'http://www.meiduo.site:8080/oauth_callback.html'
+EMAIL_USE_TLS = False
+EMAIL_HOST = 'smtp.qq.com'
+EMAIL_PORT = 25
+EMAIL_HOST_USER = '1017762632@qq.com'
+EMAIL_HOST_PASSWORD = 'onnommchvdpzbbae'
+DEFAULT_FROM_EMAIL = 'meiduo<1017762632@qq.com>'

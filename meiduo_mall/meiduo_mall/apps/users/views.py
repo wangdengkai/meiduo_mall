@@ -4,11 +4,13 @@ from django.shortcuts import render
 
 # Create your views here.
 # url(r'^usernames/(?P<username>\w{5,20})/count/$', views.UsernameCountView.as_view()),
+from django.views import View
 from rest_framework import mixins
 from rest_framework import status
 
-from rest_framework.generics import CreateAPIView,GenericAPIView, RetrieveAPIView
+from rest_framework.generics import CreateAPIView,GenericAPIView, RetrieveAPIView, UpdateAPIView
 from rest_framework.permissions import IsAuthenticated
+
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -143,4 +145,19 @@ class UserDetailView(RetrieveAPIView):
 
     def get_object(self):
         return self.request.user
+    # def get(self,request):
+    #     return  Response(data={'ok'})
+
+
+class EmailView(UpdateAPIView):
+    '''
+    保存用户邮箱
+    '''
+    permission_classes = [IsAuthenticated]
+    serializer_class = serializers.EmailSerializer
+
+    def get_object(self):
+        return  self.request.user
+
+
 
